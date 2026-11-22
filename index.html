@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WCG Radio</title>
+<meta name="description" content="WCG Radio — интернет-радио в трее Windows. Ссылка на станцию открывает её в радио.">
+<style>
+  :root { color-scheme: dark; --bg:#16151c; --panel:#211f2b; --line:#34313f; --ink:#ecebf2; --dim:#9a97a8; --accent:#8b5cf6; --accent-hot:#a07cf8; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg); color:var(--ink);
+         font: 16px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { width:min(440px, 92vw); background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:28px; }
+  h1 { margin:0 0 4px; font-size:22px; }
+  .sub { color:var(--dim); margin:0 0 22px; }
+  .station { font-size:20px; font-weight:600; margin:0 0 4px; overflow-wrap:anywhere; }
+  .url { color:var(--dim); font-size:13px; margin:0 0 22px; overflow-wrap:anywhere; }
+  .btn { display:block; text-align:center; text-decoration:none; padding:12px; border-radius:10px; margin-top:10px;
+         border:1px solid var(--line); color:var(--ink); background:transparent; font-weight:600; }
+  .btn.main { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.main:hover { background:var(--accent-hot); }
+  .btn:hover { border-color:var(--accent); }
+  .note { color:var(--dim); font-size:13px; margin-top:18px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>WCG Radio</h1>
+  <p class="sub">Интернет-радио в трее Windows</p>
+
+  <section id="share" hidden>
+    <p class="station" id="name"></p>
+    <p class="url" id="url"></p>
+    <a class="btn main" id="open" href="#">Открыть в WCG Radio</a>
+    <a class="btn" href="WCGRadio-setup.exe" download>Скачать WCG Radio</a>
+    <p class="note">Радио открывается само. Не открылось — значит, WCG Radio ещё не установлено: скачайте, установите и нажмите
+      «Открыть в WCG Radio». Станция добавится в ваш список и сразу заиграет.</p>
+  </section>
+
+  <section id="plain" hidden>
+    <a class="btn main" href="WCGRadio-setup.exe" download>Скачать WCG Radio</a>
+    <p class="note">Windows 10 и 11. Установщик ставит программу в папку пользователя, права администратора не нужны.</p>
+  </section>
+</main>
+<script>
+  // ССЫЛКА «ПОДЕЛИТЬСЯ СТАНЦИЕЙ»: ?u=<адрес потока>&n=<имя>&id=<uuid radio-browser> → wcgradio://play?… (радио регистрирует схему при
+  // установке). Адрес потока — только http(s); имя и адрес — текстом (textContent), не разметкой.
+  const q = new URLSearchParams(location.search);
+  const u = (q.get("u") || "").trim();
+  const ok = /^https?:\/\//i.test(u);
+  if (ok) {
+    const n = (q.get("n") || "").trim() || u;
+    const id = (q.get("id") || "").trim();
+    const p = new URLSearchParams({ u, n });
+    if (id) p.set("id", id);
+    const app = "wcgradio://play?" + p.toString();
+    document.getElementById("name").textContent = n;
+    document.getElementById("url").textContent = u;
+    document.getElementById("open").href = app;
+    document.getElementById("share").hidden = false;
+    document.title = n + " — WCG Radio";
+    location.href = app;
+  } else {
+    document.getElementById("plain").hidden = false;
+  }
+</script>
+</body>
+</html>
