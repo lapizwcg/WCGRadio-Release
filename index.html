@@ -44,16 +44,19 @@
   </section>
 </main>
 <script>
-  // ССЫЛКА «ПОДЕЛИТЬСЯ СТАНЦИЕЙ»: ?u=<адрес потока>&n=<имя>&id=<uuid radio-browser> → wcgradio://play?… (радио регистрирует схему при
-  // установке). Адрес потока — только http(s); имя и адрес — текстом (textContent), не разметкой.
+  // ССЫЛКА «ПОДЕЛИТЬСЯ СТАНЦИЕЙ»: ?u=<адрес потока>&n=<имя>&id=<uuid>&cc=<страна>&br=<битрейт>&f=<логотип> → wcgradio://play?…
+  // (радио регистрирует схему при установке и само проверяет параметры). Адрес потока — только http(s); имя и адрес — текстом
+  // (textContent), не разметкой.
   const q = new URLSearchParams(location.search);
   const u = (q.get("u") || "").trim();
   const ok = /^https?:\/\//i.test(u);
   if (ok) {
     const n = (q.get("n") || "").trim() || u;
-    const id = (q.get("id") || "").trim();
-    const p = new URLSearchParams({ u, n });
-    if (id) p.set("id", id);
+    const p = new URLSearchParams();
+    for (const k of ["u", "n", "id", "cc", "br", "f"]) {
+      const v = (q.get(k) || "").trim();
+      if (v) p.set(k, v);
+    }
     const app = "wcgradio://play?" + p.toString();
     document.getElementById("name").textContent = n;
     document.getElementById("url").textContent = u;
